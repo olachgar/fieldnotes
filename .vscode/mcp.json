@@ -1,0 +1,23 @@
+{
+	"servers": {
+		"fieldnotes": {
+			"type": "http",
+			"url": "http://127.0.0.1:8001/mcp",
+			"headers": {
+				"Authorization": "Bearer ${input:firebase-id-token}"
+			}
+		},
+		"my-mcp-server-f2a6a705": {
+			"url": "http://127.0.0.1:8001/mcp",
+			"type": "http"
+		}
+	},
+	"inputs": [
+		{
+			"type": "promptString",
+			"id": "firebase-id-token",
+			"description": "Current Firebase ID token for the signed-in Fieldnotes user",
+			"password": true
+		}
+	]
+}

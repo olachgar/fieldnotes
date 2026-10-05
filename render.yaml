@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: fieldnotes-api
+    runtime: python
+    region: oregon
+    plan: free
+    rootDir: backend
+    buildCommand: pip install uv && uv sync --frozen --no-dev
+    startCommand: uv run --no-sync uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: FIREBASE_PROJECT_ID
+        value: notes-mcp-a778168
+      - key: FIRESTORE_COLLECTION
+        value: notes
+      - key: GOOGLE_APPLICATION_CREDENTIALS
+        value: /etc/secrets/ServiceAccountKey.json
+      - key: CORS_ORIGINS
+        fromService:
+          type: web
+          name: fieldnotes-web
+          envVarKey: RENDER_EXTERNAL_URL
+
+  - type: web
+    name: fieldnotes-web
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: build
+    envVars:
+      - key: VITE_API_BASE_URL
+        fromService:
+          type: web
+          name: fieldnotes-api
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: VITE_FIREBASE_API_KEY
+        sync: false
+      - key: VITE_FIREBASE_AUTH_DOMAIN
+        value: notes-mcp-a778168.firebaseapp.com
+      - key: VITE_FIREBASE_PROJECT_ID
+        value: notes-mcp-a778168
+      - key: VITE_FIREBASE_APP_ID
+        value: 1:307095645554:web:8d8cd5f932c00a409401eb
